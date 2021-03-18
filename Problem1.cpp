@@ -1,16 +1,4 @@
-/*
- * GLUT Shapes Demo
- *
- * Written by Nigel Stewart November 2003
- *
- * This program is test harness for the sphere, cone
- * and torus shapes in GLUT.
- *
- * Spinning wireframe and smooth shaded shapes are
- * displayed until the ESC or q key is pressed.  The
- * number of geometry stacks and slices can be adjusted
- * using the + and - keys.
- */
+
 #include <windows.h>
 #ifdef __APPLE__
 #include <GLUT/glut.h>
@@ -226,6 +214,7 @@ void drawCylinder(double radius,double height,int segments)
 {
     int i;
     double shade;
+	int alternateColor = 1;
     struct point points[100];
     //generate points
     for(i=0;i<=segments;i++)
@@ -239,26 +228,19 @@ void drawCylinder(double radius,double height,int segments)
         //create shading effect
         if(i<segments/2)shade=2*(double)i/(double)segments;
         else shade=2*(1.0-(double)i/(double)segments);
-        glColor3f(shade,shade,shade);
+        // alternateColor colors
+		if (alternateColor)
+ 	       glColor3f(0, 0, 0);
+		else 
+ 	       glColor3f(1, 1, 1);
+		alternateColor = 1 - alternateColor;
 
 		glBegin(GL_QUADS);{
 			glVertex3f(points[i].x, points[i].y, 0);
 			glVertex3f(points[i+1].x, points[i+1].y, 0);
 			glVertex3f(points[i].x, points[i].y, height);
 			glVertex3f(points[i+1].x, points[i+1].y, height);
-			// glVertex3f( points[i].x, points[i].y, height);
-			// glVertex3f( points[i].x,-points[i].y, height);
-			// glVertex3f(-points[i].x,-points[i].y, height);
-			// glVertex3f(-points[i].x, points[i].y, height);
 		}glEnd();
-
-        // glBegin(GL_TRIANGLES);
-        // {
-        //     glVertex3f(0,0,height);
-		// 	glVertex3f(points[i].x,points[i].y,0);
-		// 	glVertex3f(points[i+1].x,points[i+1].y,0);
-        // }
-        // glEnd();
     }
 }
 
@@ -266,6 +248,7 @@ void drawSemiSphere(double radius, int slices, int stacks) {
 	struct point points[100][100];
 	int i,j;
 	double h,r;
+	int alternateColor = 1;
 	//generate points
 	for(i=0;i<=stacks;i++)
 	{
@@ -279,11 +262,15 @@ void drawSemiSphere(double radius, int slices, int stacks) {
 		}
 	}
 	//draw quads using generated points
-	for(i=0;i<stacks;i++)
-	{
-        glColor3f((double)i/(double)stacks,(double)i/(double)stacks,(double)i/(double)stacks);
-		for(j=0;j<slices;j++)
-		{
+	for(i=0;i<stacks;i++) {
+
+		for(j=0;j<slices;j++) {
+        // alternateColor colors
+		if (alternateColor)
+ 	       glColor3f(0, 0, 0);
+		else 
+ 	       glColor3f(1, 1, 1);
+		alternateColor = 1 - alternateColor;
 			glBegin(GL_QUADS);{
 
 				glVertex3f(points[i][j].x,points[i][j].y,points[i][j].z);
@@ -337,19 +324,29 @@ void drawSphere(double radius,int slices,int stacks)
 }
 
 void solve() {
+
 	// making an initial rotation
 	glRotatef(90,1,0,0);
+	// drawing white board
+	glPushMatrix();
+    {
+        // glRotatef(angle,0,0,1);
+        glTranslatef(0, 0, -500);
+        glColor3f(1, 1, 1);
+        drawSquare(200);
+    }
+    glPopMatrix();
 	// drawing the first semisphere
 	{
         glColor3f(1,0,0);
 		glRotatef(gunAngle,0,1,0);
-		drawSemiSphere(30, 10, 10);
+		drawSemiSphere(30, 100, 20);
     }
 	// drawing the first semisphere
 	{
 		glColor3f(1,0,0);
 		glRotatef(-180 + gunSphereAngle,1,0,0);
-		drawSemiSphere(30, 10, 10);
+		drawSemiSphere(30, 100, 20);
 	}
 	// drawing the litol semisphere
 	{
@@ -358,7 +355,7 @@ void solve() {
 		glRotatef(-180 ,0,1,0);
 		glRotatef(gunBarrelAngle, 1, 0, 0);
 		glTranslatef(0, 0, -10);
-		drawSemiSphere(10, 10, 10);
+		drawSemiSphere(10, 100, 20);
 	}
 
 	// drawing the barrel
