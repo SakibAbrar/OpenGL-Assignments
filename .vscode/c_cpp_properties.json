@@ -1,0 +1,37 @@
+{
+  "configurations": [
+    {
+      "name": "Win32",
+      "includePath": ["${workspaceFolder}/**"],
+      "defines": ["_DEBUG", "UNICODE", "_UNICODE"],
+      "compilerPath": "gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "gnu++14",
+      "intelliSenseMode": "windows-gcc-x86",
+      "compilerArgs": [
+        "-g",
+        "-std=c++17",
+        "-I./OpenGL/include",
+        "-L./OpenGL/lib",
+        "./main.cpp",
+        "-lglu32",
+        "-lglut32",
+        "-lopengl32",
+        "-o",
+        "./${relativeFile}.exe",
+        "&&",
+        ".\\\\${relativeFile}.exe"
+      ]
+    },
+    {
+      "name": "OpenGL",
+      "includePath": ["${workspaceFolder}/**"],
+      "defines": ["_DEBUG", "UNICODE", "_UNICODE"],
+      "compilerPath": "gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "gnu++14",
+      "intelliSenseMode": "windows-gcc-x86"
+    }
+  ],
+  "version": 4
+}

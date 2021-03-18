@@ -1,0 +1,48 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "cppbuild",
+      "label": "C/C++: g++.exe build active file",
+      "command": "g++",
+      "args": [
+        "-g",
+        "-std=c++17",
+        "-I./OpenGL/include",
+        "-L./OpenGL/lib",
+        "${relativeFile}",
+        "-lglu32",
+        "-lglut32",
+        "-lopengl32",
+        "-o",
+        "./${relativeFile}.exe",
+        "&&",
+        ".\\${relativeFile}.exe"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": ["$gcc"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "detail": "compiler OPENGL"
+    },
+    {
+      "type": "process",
+      "label": "C/C++: run built file",
+      "command": "./main.exe",
+      "args": [],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": ["$gcc"],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "detail": "Run ${relativeFile}.exe"
+    }
+  ]
+}
