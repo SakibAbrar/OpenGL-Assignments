@@ -91,6 +91,22 @@ double gunSphereAngle = 0;
 double gunBarrelAngle = 0;
 double gunBarrelRotateAngle = 0;
 
+struct bullet {
+	double gunAngle, gunSphereAngle, gunBarrelAngle, gunBarrelRotateAngle;
+	bullet() {gunAngle = gunSphereAngle = gunBarrelAngle = gunBarrelRotateAngle = 0;}
+	bullet(double _gunAngle, double _gunSphereAngle, double _gunBarrelAngle, double _gunBarrelRotateAngle) {
+		gunAngle = _gunAngle;
+		gunSphereAngle = _gunSphereAngle;
+		gunBarrelAngle = _gunBarrelAngle;
+		gunBarrelRotateAngle = _gunBarrelRotateAngle;
+	}
+};
+#define maxBullet 50
+int numberOfbullets = 0;
+bullet bullets[maxBullet];
+double whiteboardDistance = 800;
+double whiteboardLength = 400;
+
 void incrementAngle(double &angle, double angleLimit) {
 	if (angle + rotationConst < angleLimit)
 		angle += rotationConst;
@@ -174,35 +190,6 @@ void drawCircle(double radius,int segments)
     {
         glBegin(GL_LINES);
         {
-			glVertex3f(points[i].x,points[i].y,0);
-			glVertex3f(points[i+1].x,points[i+1].y,0);
-        }
-        glEnd();
-    }
-}
-
-void drawCone(double radius,double height,int segments)
-{
-    int i;
-    double shade;
-    struct point points[100];
-    //generate points
-    for(i=0;i<=segments;i++)
-    {
-        points[i].x=radius*cos(((double)i/(double)segments)*2*pi);
-        points[i].y=radius*sin(((double)i/(double)segments)*2*pi);
-    }
-    //draw triangles using generated points
-    for(i=0;i<segments;i++)
-    {
-        //create shading effect
-        if(i<segments/2)shade=2*(double)i/(double)segments;
-        else shade=2*(1.0-(double)i/(double)segments);
-        glColor3f(shade,shade,shade);
-
-        glBegin(GL_TRIANGLES);
-        {
-            glVertex3f(0,0,height);
 			glVertex3f(points[i].x,points[i].y,0);
 			glVertex3f(points[i+1].x,points[i+1].y,0);
         }
@@ -323,6 +310,22 @@ void drawSphere(double radius,int slices,int stacks)
 	}
 }
 
+void drawBullets() {
+	for (int idx = 0; idx < numberOfbullets; idx ++) {
+		glPushMatrix();
+		{
+			glColor3f(1,0,0);
+			glRotatef(bullets[idx].gunAngle,0,1,0);
+			glRotatef(-180 + bullets[idx].gunSphereAngle,1,0,0);
+			glRotatef(-180 ,0,1,0);
+			glRotatef(bullets[idx].gunBarrelAngle, 1, 0, 0);
+			glTranslatef(0, 0, -(whiteboardDistance - 2));
+			drawSquare(4);
+		}
+		glPopMatrix();
+	}
+}
+
 void solve() {
 
 	// making an initial rotation
@@ -331,70 +334,46 @@ void solve() {
 	glPushMatrix();
     {
         // glRotatef(angle,0,0,1);
-        glTranslatef(0, 0, -500);
-        glColor3f(1, 1, 1);
-        drawSquare(200);
+        glTranslatef(0, 0, -whiteboardDistance);
+        glColor3f(0.6, 0.6, 0.6);
+        drawSquare(whiteboardLength);
     }
     glPopMatrix();
-	// drawing the first semisphere
-	{
-        glColor3f(1,0,0);
-		glRotatef(gunAngle,0,1,0);
-		drawSemiSphere(30, 100, 20);
-    }
-	// drawing the first semisphere
-	{
-		glColor3f(1,0,0);
-		glRotatef(-180 + gunSphereAngle,1,0,0);
-		drawSemiSphere(30, 100, 20);
-	}
-	// drawing the litol semisphere
-	{
-		glColor3f(1,0,0);
-		glTranslatef(0, 0, 30);
-		glRotatef(-180 ,0,1,0);
-		glRotatef(gunBarrelAngle, 1, 0, 0);
-		glTranslatef(0, 0, -10);
-		drawSemiSphere(10, 100, 20);
-	}
-
-	// drawing the barrel
-	{
-		glRotatef(-180 ,0,1,0);
-		glRotatef(gunBarrelRotateAngle, 0, 0, 1);
-		drawCylinder(10, 100, 30);
-	}
-
-}
-
-
-void drawSS()
-{
-    glColor3f(1,0,0);
-    drawSquare(20);
-
-    glRotatef(angle,0,0,1);
-    glTranslatef(110,0,0);
-    glRotatef(2*angle,0,0,1);
-    glColor3f(0,1,0);
-    drawSquare(15);
-
-    glPushMatrix();
+	glPushMatrix();
     {
-        glRotatef(angle,0,0,1);
-        glTranslatef(60,0,0);
-        glRotatef(2*angle,0,0,1);
-        glColor3f(0,0,1);
-        drawSquare(10);
-    }
-    glPopMatrix();
+		// drawing the first semisphere
+		{
+			glColor3f(1,0,0);
+			glRotatef(gunAngle,0,1,0);
+			drawSemiSphere(30, 100, 20);
+		}
+		// drawing the second semisphere
+		{
+			glColor3f(1,0,0);
+			glRotatef(-180 + gunSphereAngle,1,0,0);
+			drawSemiSphere(30, 100, 20);
+		}
+		// drawing the litol semisphere
+		{
+			glColor3f(1,0,0);
+			glTranslatef(0, 0, 30);
+			glRotatef(-180 ,0,1,0);
+			glRotatef(-gunBarrelAngle, 1, 0, 0);
+			glRotatef(gunBarrelRotateAngle, 0, 0, 1);
+			glTranslatef(0, 0, -10);
+			drawSemiSphere(10, 100, 20);
+		}
 
-    glRotatef(3*angle,0,0,1);
-    glTranslatef(40,0,0);
-    glRotatef(4*angle,0,0,1);
-    glColor3f(1,1,0);
-    drawSquare(5);
+		// drawing the barrel
+		{
+			glRotatef(-180 ,0,1,0);
+			drawCylinder(10, 100, 50);
+		}
+	}
+    glPopMatrix();
+	drawBullets();
 }
+
 
 void keyboardListener(unsigned char key, int x,int y){
 	switch(key){
@@ -468,24 +447,24 @@ void keyboardListener(unsigned char key, int x,int y){
 void specialKeyListener(int key, int x,int y){
 	switch(key){
 		case GLUT_KEY_DOWN:		//down arrow key
-			cameraPos -= l * 1.0;
+			cameraPos -= l * moveConst;
 			break;
 		case GLUT_KEY_UP:		// up arrow key
-			cameraPos += l * 1.0;
+			cameraPos += l * moveConst;
 			break;
 
 		case GLUT_KEY_RIGHT:
-			cameraPos += r * 1.0;
+			cameraPos += r * moveConst;
 			break;
 		case GLUT_KEY_LEFT:
-			cameraPos -= r * 1.0;
+			cameraPos -= r * moveConst;
 			break;
 
 		case GLUT_KEY_PAGE_UP:
-			cameraPos += u * 1.0;
+			cameraPos += u * moveConst;
 			break;
 		case GLUT_KEY_PAGE_DOWN:
-			cameraPos -= u * 1.0;
+			cameraPos -= u * moveConst;
 			break;
 
 		case GLUT_KEY_INSERT:
@@ -501,12 +480,22 @@ void specialKeyListener(int key, int x,int y){
 	}
 }
 
+bool withinLimit(double angle, double limit) {
+	return fabs(angle) < limit;
+}
+
 
 void mouseListener(int button, int state, int x, int y){	//x, y is the x-y of the screen (2D)
 	switch(button){
 		case GLUT_LEFT_BUTTON:
 			if(state == GLUT_DOWN){		// 2 times?? in ONE click? -- solution is checking DOWN or UP
-				drawaxes = 1 - drawaxes;
+				double  angleLimit = atan2 (whiteboardLength, whiteboardDistance) * 180 / pi;
+				if ( withinLimit(gunAngle, angleLimit) && 
+				withinLimit(gunSphereAngle, angleLimit) &&
+				withinLimit(gunBarrelAngle, angleLimit)) {
+					bullets[numberOfbullets] = bullet(gunAngle, gunSphereAngle, gunBarrelAngle, gunBarrelRotateAngle);
+					numberOfbullets++;
+				}
 			}
 			break;
 
@@ -517,7 +506,9 @@ void mouseListener(int button, int state, int x, int y){	//x, y is the x-y of th
 			break;
 
 		case GLUT_MIDDLE_BUTTON:
-			//........
+			if(state == GLUT_DOWN){		// 2 times?? in ONE click? -- solution is checking DOWN or UP
+				drawaxes = 1 - drawaxes;
+			}
 			break;
 
 		default:
@@ -568,7 +559,6 @@ void display(){
     //glColor3f(1,0,0);
     //drawSquare(10);
 
-    // drawSS();
 	solve();
 
     //drawCircle(30,24);
